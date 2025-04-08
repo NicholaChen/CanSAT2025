@@ -61,10 +61,7 @@ void saveCalibration() {
 }
 
 void loadCalibration() {
-    Serial.println("Load calibrated parameters from EEPROM");
     if (isCalibrated()) {
-        Serial.println("calibrated? : YES");
-        Serial.println("load calibrated values");
         mpu.setAccBias(
             readFloat(EEP_ACC_BIAS + 0),
             readFloat(EEP_ACC_BIAS + 4),
@@ -82,58 +79,9 @@ void loadCalibration() {
             readFloat(EEP_MAG_SCALE + 4),
             readFloat(EEP_MAG_SCALE + 8));
     } else {
-        Serial.println("calibrated? : NO");
-        Serial.println("load default values");
         mpu.setAccBias(0., 0., 0.);
         mpu.setGyroBias(0., 0., 0.);
         mpu.setMagBias(0., 0., 0.);
         mpu.setMagScale(1., 1., 1.);
     }
-}
-
-void printCalibration() {
-    Serial.println("< calibration parameters >");
-    Serial.print("calibrated? : ");
-    Serial.println(readByte(EEP_CALIB_FLAG) ? "YES" : "NO");
-    Serial.print("acc bias x  : ");
-    Serial.println(readFloat(EEP_ACC_BIAS + 0) * 1000.f / MPU9250::CALIB_ACCEL_SENSITIVITY);
-    Serial.print("acc bias y  : ");
-    Serial.println(readFloat(EEP_ACC_BIAS + 4) * 1000.f / MPU9250::CALIB_ACCEL_SENSITIVITY);
-    Serial.print("acc bias z  : ");
-    Serial.println(readFloat(EEP_ACC_BIAS + 8) * 1000.f / MPU9250::CALIB_ACCEL_SENSITIVITY);
-    Serial.print("gyro bias x : ");
-    Serial.println(readFloat(EEP_GYRO_BIAS + 0) / MPU9250::CALIB_GYRO_SENSITIVITY);
-    Serial.print("gyro bias y : ");
-    Serial.println(readFloat(EEP_GYRO_BIAS + 4) / MPU9250::CALIB_GYRO_SENSITIVITY);
-    Serial.print("gyro bias z : ");
-    Serial.println(readFloat(EEP_GYRO_BIAS + 8) / MPU9250::CALIB_GYRO_SENSITIVITY);
-    Serial.print("mag bias x  : ");
-    Serial.println(readFloat(EEP_MAG_BIAS + 0));
-    Serial.print("mag bias y  : ");
-    Serial.println(readFloat(EEP_MAG_BIAS + 4));
-    Serial.print("mag bias z  : ");
-    Serial.println(readFloat(EEP_MAG_BIAS + 8));
-    Serial.print("mag scale x : ");
-    Serial.println(readFloat(EEP_MAG_SCALE + 0));
-    Serial.print("mag scale y : ");
-    Serial.println(readFloat(EEP_MAG_SCALE + 4));
-    Serial.print("mag scale z : ");
-    Serial.println(readFloat(EEP_MAG_SCALE + 8));
-}
-
-void printBytes() {
-    for (size_t i = 0; i < EEPROM_SIZE; ++i)
-        Serial.println(readByte(i), HEX);
-}
-
-void setupEEPROM() {
-    Serial.println("EEPROM start");
-
-    if (!isCalibrated()) {
-        Serial.println("Need Calibration!!");
-    }
-    Serial.println("EEPROM calibration value is : ");
-    printCalibration();
-    Serial.println("Loaded calibration value is : ");
-    loadCalibration();
 }
