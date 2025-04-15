@@ -69,13 +69,13 @@ void setup() {
 void loop() {
   recvWithStartEndMarkers();
   if (newData > 0) {
-    Serial.print(newData);
-    Serial.print("\t");
-    for (int i=0;i<newData;i++) {
-      Serial.print((uint8_t) receivedChars[i]);
-      Serial.print(" ");
-    }
-    Serial.println("");
+    // Serial.print(newData);
+    // Serial.print("\t");
+    // for (int i=0;i<newData;i++) {
+    //   Serial.print((uint8_t) receivedChars[i]);
+    //   Serial.print(" ");
+    // }
+    // Serial.println("");
 
     if (newData == 1 && receivedChars[0]==0) {
       ArduinoSerial.write((uint8_t) 0);
