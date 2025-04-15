@@ -13,7 +13,6 @@ MPU9250 mpu;
 #define filename F("data.txt")
 
 NeoSWSerial SDSerial(2, 3);
-NeoSWSerial CameraSerial(5, 4);
 
 
 RTC_DS3231 rtc;
@@ -52,8 +51,9 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   Wire.begin();
   
+  Serial.begin(19200);
   SDSerial.begin(19200);
-  CameraSerial.begin(19200);
+  Serial.begin(19200);
 
   if (!bmp.begin()) {
     blink(3);
@@ -78,7 +78,7 @@ void setup() {
   if (!rtc.begin()) {
     blink(5);
   }
-  
+
   SDSerial.listen();
 
   while (1) {
@@ -96,15 +96,15 @@ void setup() {
     delay(50);
   }
 
-  CameraSerial.listen();
+  //Serial.listen();
   while (1) {
-    for (int i = 0; i < 4; i++) CameraSerial.write(255);
-    CameraSerial.write((uint8_t) 0);
-    for (int i = 0; i < 4; i++) CameraSerial.write(254);
-    if (CameraSerial.available() > 0) {
-      if (CameraSerial.read() == 0) {
-        while (CameraSerial.available() > 0) {
-          CameraSerial.read();
+    for (int i = 0; i < 4; i++) Serial.write(255);
+    Serial.write((uint8_t) 0);
+    for (int i = 0; i < 4; i++) Serial.write(254);
+    if (Serial.available() > 0) {
+      if (Serial.read() == 0) {
+        while (Serial.available() > 0) {
+          Serial.read();
         }
         break;
       }
@@ -122,7 +122,6 @@ void loop() {
   mpu.update();
 
   if (m > prev_ms + 25) {
-    SDSerial.listen();
     t = rtc.now();
     data.time = t.unixtime();
     data.micro = micros();
@@ -151,22 +150,22 @@ void loop() {
     data.mpu_magz = mpu.getMagZ();
 
     data.mpu_temperature = mpu.getTemperature();
-
+    SDSerial.listen();
     for (int i = 0; i < 4; i++) SDSerial.write(255);
     SDSerial.write((const char*) &data, sizeof(struct dataStruct));
     for (int i = 0; i < 4; i++) SDSerial.write(254);
     prev_ms = m;
     
-    CameraSerial.listen();
+    //Serial.listen();
   }
   
-  if (CameraSerial.available() > 0) {
-    while (CameraSerial.available() > 0) {
-      CameraSerial.read();
+  if (Serial.available() > 0) {
+    while (Serial.available() > 0) {
+      Serial.read();
     }
-    for (int i = 0; i < 4; i++) CameraSerial.write(255);
-    CameraSerial.write((const char*) t.unixtime(), sizeof(uint32_t));
-    for (int i = 0; i < 4; i++) CameraSerial.write(254);
+    for (int i = 0; i < 4; i++) Serial.write(255);
+    Serial.write((const char*) t.unixtime(), sizeof(uint32_t));
+    for (int i = 0; i < 4; i++) Serial.write(254);
   }
 }
 
