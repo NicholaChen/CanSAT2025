@@ -55,15 +55,16 @@ void setup() {
   SDSerial.begin(19200);
   Serial.begin(19200);
 
-  if (!bmp.begin()) {
-    blink(3);
+  if (!bmp.begin(0x76)) { 
+    
+    blink(1);
   }
+ 
   
   bmp.setSampling(Adafruit_BMP280::MODE_NORMAL, Adafruit_BMP280::SAMPLING_X2, Adafruit_BMP280::SAMPLING_X16, Adafruit_BMP280::FILTER_X16, Adafruit_BMP280::STANDBY_MS_500);
 
-  
-  if (!mpu.setup(0x68)) {
-    blink(4);
+  if (!mpu.setup(0x69)) {
+    blink(2);
   }
   mpu.setAccBias(
       871.70, -184.70, -877.00);
@@ -76,7 +77,7 @@ void setup() {
 
 
   if (!rtc.begin()) {
-    blink(5);
+    blink(3);
   }
 
   SDSerial.listen();
@@ -155,8 +156,6 @@ void loop() {
     SDSerial.write((const char*) &data, sizeof(struct dataStruct));
     for (int i = 0; i < 4; i++) SDSerial.write(254);
     prev_ms = m;
-    
-    //Serial.listen();
   }
   
   if (Serial.available() > 0) {
@@ -164,7 +163,8 @@ void loop() {
       Serial.read();
     }
     for (int i = 0; i < 4; i++) Serial.write(255);
-    Serial.write((const char*) t.unixtime(), sizeof(uint32_t));
+    uint32_t timestamp = t.unixtime();
+    Serial.write((const char*) &timestamp, sizeof(uint32_t));
     for (int i = 0; i < 4; i++) Serial.write(254);
   }
 }
